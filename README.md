@@ -1,2 +1,2 @@
-# nxp_ppc_demo
-NXP MPC5xxx Microcontrollers Software Demo
+# NXP_MPC57XX_Demo
+NXP MPC57xx Microcontrollers Software Demo
