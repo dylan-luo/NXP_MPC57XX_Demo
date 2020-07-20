@@ -1,0 +1,11 @@
+# Generated files
+/Generated_Code/
+/SDK/
+
+# Debug files
+/Debug/
+/Debug_RAM/
+/Release/
+
+.mpc5746r_sdk_demo_Z4_1.g_c
+.mpc5746r_sdk_demo_Z4_1.g_x
