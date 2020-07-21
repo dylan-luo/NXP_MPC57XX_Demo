@@ -8,6 +8,10 @@
 #ifndef RESET_H_
 #define RESET_H_
 
+#define FLEXCAN0_INIT
+#define TIMER_INIT
+#define DSPI_INIT
+
 void Timer_Reset(void);
 void FlexCAN0_Reset(void);
 void DSPI0_Reset(void);

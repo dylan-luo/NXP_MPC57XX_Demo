@@ -47,13 +47,11 @@ void FlexCAN0_Reset(void)
     }
 
     /* The MB must be initialized before inactivate it. */
-#if 1
     /* Inactivate all message buffers */
     for (i = 0; i < 64; i++)
     {
         CAN_0.MB[i].CS.B.CODE = 0;
     }
-#endif
     /* Enter Freeze Mode Required before to enter Disabled Mode */
     CAN_0.MCR.B.FRZ = 1;
     CAN_0.MCR.B.HALT = 1;
@@ -197,13 +195,19 @@ void Clock_Reset(void)
 /* do the preparation for bootloader jump to user app */
 void Prepare_Before_Jump(void)
 {
+#ifdef TIMER_INIT
     /*Reset the initialized PIT and STM module*/
     Timer_Reset();
+#endif
+#ifdef FLEXCAN0_INIT
     /*Reset and shutdown FlexCAN0 module*/
     FlexCAN0_Reset();
+#endif
+#ifdef DSPI_INIT
     /*Reset DSPI0, DSPI1 module*/
     DSPI0_Reset();
     DSPI1_Reset();
+#endif
     /*Reset system clock module*/
     Clock_Reset();
 //    /*Disable the CPU interrupt*/

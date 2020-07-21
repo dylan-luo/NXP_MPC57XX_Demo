@@ -69,27 +69,9 @@ volatile int exit_code = 0;
 /* Only one demo example can run at the same time. */
 //#define CAN_TEST
 
-#if 0
-/*
- * FlexCAN0 de-initialize function
- * reset its registers and shutdown the peripheral module
- */
-void FlexCAN0_Reset(void)
-{
-    /* Reset FlexCAN Module */
-    CAN_0->MCR = (CAN_0->MCR & ~CAN_MCR_SOFTRST_MASK) | CAN_MCR_SOFTRST(1U);
-    while (((CAN_0->MCR & CAN_MCR_SOFTRST_MASK) >> CAN_MCR_SOFTRST_SHIFT) == 0U);
+#define BIN_WELCOME "\r\nWelcome to MPC5746R SDK Demo "
+#define BIN_VERSION "20200721-0.0.1"
 
-    /* Set FRZ bit */
-    CAN_0->MCR = (CAN_0->MCR & ~CAN_MCR_FRZ_MASK) | CAN_MCR_FRZ(1U);
-    CAN_0->MCR = (CAN_0->MCR & ~CAN_MCR_HALT_MASK) | CAN_MCR_HALT(1U);
-
-    /* Clock disable (module) */
-    CAN_0->MCR = (CAN_0->MCR & ~CAN_MCR_MDIS_MASK) | CAN_MCR_MDIS(1U);
-    /* Wait until disable mode acknowledged */
-    while (((CAN_0->MCR & CAN_MCR_LPMACK_MASK) >> CAN_MCR_LPMACK_SHIFT) == 0U) {}
-}
-#endif
 /*!
   \brief The main function for the project.
   \details The startup initialization sequence is the following:
@@ -120,16 +102,25 @@ int main(void)
     /* Enable system global interrupt */
 	INT_SYS_EnableIRQGlobal();
 
+    UART_Printf(BIN_WELCOME);
+    UART_Printf(BIN_VERSION);
+    UART_Printf("\r\nBuild Date: %s, %s\r\n", __DATE__, __TIME__);
+
+#ifdef FLEXCAN0_INIT
 	/* FlexCAN0, 500kps, TX PF[12], RX PF[13] */
 	DevAssert(STATUS_SUCCESS == CAN_Init());
+#endif
+#ifdef TIMER_INIT
 	/* PIT_0, 1s interrupt */
 	DevAssert(STATUS_SUCCESS == TIMER_Init());
+#endif
+#ifdef DSPI_INIT
     /* DSPI_0 Master: baudrate = 500 kbit/s */
     /* SCK PJ[14], CS Output PK[5], CS Input PK[5], SDI PK[1], SDO PK[2] */
     /* DSPI_1 Slave : baudrate = 500 kbit/s */
     /* SCK PG[13], CS Input PG[9], SDI PG[11], SDO PG[12] */
 	DevAssert(STATUS_SUCCESS == SPI_Init());
-
+#endif
 #ifdef UART_TEST
     UART_Task();
 #endif
