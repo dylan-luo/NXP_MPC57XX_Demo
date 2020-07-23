@@ -70,7 +70,7 @@ volatile int exit_code = 0;
 //#define CAN_TEST
 
 #define BIN_WELCOME "\r\nWelcome to MPC5746R SDK Demo "
-#define BIN_VERSION "20200721-0.0.1"
+#define BIN_VERSION "20200723-0.0.2"
 
 /*!
   \brief The main function for the project.
@@ -109,6 +109,10 @@ int main(void)
 #ifdef FLEXCAN0_INIT
 	/* FlexCAN0, 500kps, TX PF[12], RX PF[13] */
 	DevAssert(STATUS_SUCCESS == CAN_Init());
+#endif
+#ifdef FLEXCAN1_INIT
+    /* FlexCAN1, 500kps, TX PD[1], RX PD[0] */
+    DevAssert(STATUS_SUCCESS == CAN_Init());
 #endif
 #ifdef TIMER_INIT
 	/* PIT_0, 1s interrupt */

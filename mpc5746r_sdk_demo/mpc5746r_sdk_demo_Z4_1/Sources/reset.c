@@ -117,6 +117,95 @@ void FlexCAN0_Reset(void)
     }
 }
 
+/*
+ * FlexCAN1 de-initialize function
+ * reset its registers and shutdown the peripheral module
+ */
+void FlexCAN1_Reset(void)
+{
+    uint32_t i;
+    bool enabled = false;
+    uint32_t aux = 0U;
+    uint32_t tempIMSK[2], tempMCR;
+
+    /* Disable FlexCAN0 individual interrupt for a specified IRQ */
+    for (i = 683; i <= 688; i++)
+    {
+        INTC_0.PSR[i].B.PRIN = 0;
+    }
+#if 1
+    /* The MB must be initialized before inactivate it. */
+    /* Inactivate all message buffers */
+    for (i = 0; i < 64; i++)
+    {
+        CAN_1.MB[i].CS.B.CODE = 0;
+    }
+#endif
+    /* Enter Freeze Mode Required before to enter Disabled Mode */
+    CAN_1.MCR.B.FRZ = 1;
+    CAN_1.MCR.B.HALT = 1;
+    if (CAN_1.MCR.B.MDIS == 0U)
+    {
+        enabled = true;
+    }
+    else
+    {
+        CAN_1.MCR.B.MDIS = 0U;
+    }
+
+    CAN_1.TIMER.R = 0U;
+    while ((CAN_1.MCR.B.FRZACK == 0) && (aux < 730U))
+    {
+        /* Wait until finish counting 730 bit times and exit*/
+        aux = (uint32_t)CAN_1.TIMER.R;
+    }
+    if (CAN_1.MCR.B.FRZACK == 0U)
+    {
+        /* Save registers before Soft Reset */
+        tempIMSK[0] = CAN_1.IMASK1.R;
+        tempIMSK[1] = CAN_1.IMASK2.R;
+        tempMCR = CAN_1.MCR.R;
+        /* Soft Reset FlexCan */
+        CAN_1.MCR.B.SOFTRST = 1;
+        while (CAN_1.MCR.B.SOFTRST == 1) {}
+        /* Restore registers after Soft Reset */
+        CAN_1.IMASK1.R = tempIMSK[0];
+        CAN_1.IMASK2.R = tempIMSK[1];
+        CAN_1.MCR.R = tempMCR;
+        /* Disable the Protection again because is enabled by soft reset */
+        /* Enable write of MECR register */
+        CAN_1.CTRL2.B.ECRWRE = 1;
+        /* Enable write of MECR */
+        CAN_1.MECR.B.ECRWRDIS = 0;
+        /* Disable Error Detection and Correction mechanism,
+         * that will set CAN in Freeze Mode in case of trigger */
+        CAN_1.MECR.B.NCEFAFRZ = 0;
+        /* Disable write of MECR */
+        CAN_1.CTRL2.B.ECRWRE = 0;
+    }
+
+    /* Wait for entering the freeze mode */
+    while (CAN_1.MCR.B.FRZACK == 0) {}
+    if (false == enabled)
+    {
+        CAN_1.MCR.B.MDIS = 1;
+        /* Wait until disable mode acknowledged */
+        while (CAN_1.MCR.B.LPMACK == 0U) {}
+    }
+
+    /* Disable FlexCAN.*/
+    /* To access the memory mapped registers */
+    /* Enter disable mode (hard reset). */
+    if (CAN_1.MCR.B.MDIS == 0U)
+    {
+        /* Clock disable (module) */
+        CAN_1.MCR.B.MDIS = 1;
+
+        /* Wait until disable mode acknowledged */
+        while (CAN_1.MCR.B.LPMACK == 0U) {}
+    }
+}
+
 void DSPI0_Reset(void)
 {
     uint32_t i;
@@ -175,6 +264,8 @@ void Clock_Reset(void)
 {
     uint32_t i;
 
+    PLLDIG.PLL0DV.R = 0u;
+    PLLDIG.PLL1DV.R = 0u;
     /* Enables IRC sources. Disables XOSC and PLL sources. Sets IRC source as system clock */
     MC_ME.DRUN_MC.R = 0x00130010;
 
@@ -183,13 +274,14 @@ void Clock_Reset(void)
     {
         MC_ME.RUN_PC[i].R = 0;
     }
-
+#if 1
     /* Clock sources are enabled after mode transition */
     /* Mode Transition to enter DRUN mode */
     MC_ME.MCTL.R = 0x30005AF0;      /* Enter DRUN Mode & Key */
     MC_ME.MCTL.R = 0x3000A50F;      /* Enter DRUN Mode & Inverted Key */
     while (MC_ME.GS.B.S_MTRANS);  /* Wait for mode transition to complete */
     while (MC_ME.GS.B.S_CURRENT_MODE != 3);  /* Verify DRUN is the current mode */
+#endif
 }
 
 /* do the preparation for bootloader jump to user app */
@@ -203,6 +295,10 @@ void Prepare_Before_Jump(void)
     /*Reset and shutdown FlexCAN0 module*/
     FlexCAN0_Reset();
 #endif
+#ifdef FLEXCAN1_INIT
+    /*Reset and shutdown FlexCAN1 module*/
+    FlexCAN1_Reset();
+#endif
 #ifdef DSPI_INIT
     /*Reset DSPI0, DSPI1 module*/
     DSPI0_Reset();
@@ -210,6 +306,6 @@ void Prepare_Before_Jump(void)
 #endif
     /*Reset system clock module*/
     Clock_Reset();
-//    /*Disable the CPU interrupt*/
-//    PPCASM(" wrteei 0 ");
+    /*Disable the CPU interrupt*/
+    __asm__(" wrteei 0 ");
 }

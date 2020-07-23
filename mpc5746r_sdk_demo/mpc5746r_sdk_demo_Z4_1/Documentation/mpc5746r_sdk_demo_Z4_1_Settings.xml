@@ -131,7 +131,7 @@
     <Enabled v="Y" />
     <Properties>
       <Component_name v="canCom1" />
-      <Device v="CAN_0" />
+      <Device v="CAN_1" />
       <Component_version v="S32_SDK_C55_NO_FD" />
     </Properties>
     <Methods>
