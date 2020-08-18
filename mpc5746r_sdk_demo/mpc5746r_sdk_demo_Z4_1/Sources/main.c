@@ -167,11 +167,11 @@ int main(void)
     RAMCODE_Task();
 #endif
 
-    /* Toggle PH[0] pin 20 time, shows the program is running well before de-init */
-    for (int i = 0; i < 20; i++)
+    /* Toggle PH[0] pin 10 time, shows the program is running well before de-init */
+    for (int i = 0; i < 10; i++)
     {
         PINS_DRV_TogglePins(PTH, 1 << 0);
-        OSIF_TimeDelay(200);
+        OSIF_TimeDelay(100);
     }
     /* De-init peripherals used, Sets IRC source as system clock */
     Prepare_Before_Jump();
@@ -179,6 +179,7 @@ int main(void)
     PINS_DRV_ClearPins(PTH, 1 << 0);
     PINS_DRV_ClearPins(PTH, 1 << 1);
 
+    Sys_Reset();
     /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
   /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/
   #ifdef PEX_RTOS_START

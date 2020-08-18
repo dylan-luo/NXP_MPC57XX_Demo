@@ -123,6 +123,7 @@ void FlexCAN0_Reset(void)
  */
 void FlexCAN1_Reset(void)
 {
+#if 0
     uint32_t i;
     bool enabled = false;
     uint32_t aux = 0U;
@@ -204,7 +205,58 @@ void FlexCAN1_Reset(void)
         /* Wait until disable mode acknowledged */
         while (CAN_1.MCR.B.LPMACK == 0U) {}
     }
+#else
+#if 1
+    CAN_1.MCR.B.MDIS = 0;
+    CAN_1.MCR.B.FRZ = 1;
+    CAN_1.MCR.B.HALT = 1;
+    while (CAN_1.MCR.B.FRZACK != 1);
+
+    CAN_1.CTRL1.R = 0;
+    CAN_1.ECR.R = 0;
+    CAN_1.MCR.B.MDIS = 1;
+#endif
+#if 0
+    /* Reset FlexCAN Module */
+    CAN_1.MCR.B.SOFTRST = 1;
+    while (CAN_1.MCR.B.SOFTRST == 1)
+    {
+        ;
+    }
+    /* Set FRZ bit */
+    CAN_1.MCR.B.HALT = 1;
+    CAN_1.MCR.B.FRZ = 1;
+//    while (CAN_1.MCR.B.FRZACK == 0)
+//    {
+//        ;
+//    }
+    /* Disable the module */
+    CAN_1.MCR.B.MDIS = 1;
+#endif
+#endif
 }
+
+#if 0
+/*
+ * FlexCAN0 de-initialize function
+ * reset its registers and shutdown the peripheral module
+ */
+void FlexCAN0_Reset(void)
+{
+    /* Reset FlexCAN Module */
+    CAN_0->MCR = (CAN_0->MCR & ~CAN_MCR_SOFTRST_MASK) | CAN_MCR_SOFTRST(1U);
+    while (((CAN_0->MCR & CAN_MCR_SOFTRST_MASK) >> CAN_MCR_SOFTRST_SHIFT) == 0U);
+
+    /* Set FRZ bit */
+    CAN_0->MCR = (CAN_0->MCR & ~CAN_MCR_FRZ_MASK) | CAN_MCR_FRZ(1U);
+    CAN_0->MCR = (CAN_0->MCR & ~CAN_MCR_HALT_MASK) | CAN_MCR_HALT(1U);
+
+    /* Clock disable (module) */
+    CAN_0->MCR = (CAN_0->MCR & ~CAN_MCR_MDIS_MASK) | CAN_MCR_MDIS(1U);
+    /* Wait until disable mode acknowledged */
+    while (((CAN_0->MCR & CAN_MCR_LPMACK_MASK) >> CAN_MCR_LPMACK_SHIFT) == 0U) {}
+}
+#endif
 
 void DSPI0_Reset(void)
 {
@@ -264,8 +316,8 @@ void Clock_Reset(void)
 {
     uint32_t i;
 
-    PLLDIG.PLL0DV.R = 0u;
-    PLLDIG.PLL1DV.R = 0u;
+//    PLLDIG.PLL0DV.R = 0u;
+//    PLLDIG.PLL1DV.R = 0u;
     /* Enables IRC sources. Disables XOSC and PLL sources. Sets IRC source as system clock */
     MC_ME.DRUN_MC.R = 0x00130010;
 
@@ -308,4 +360,10 @@ void Prepare_Before_Jump(void)
     Clock_Reset();
     /*Disable the CPU interrupt*/
     __asm__(" wrteei 0 ");
+}
+
+void Sys_SoftReset()
+{
+    MC_ME.MCTL.R = 0x00005AF0;
+    MC_ME.MCTL.R = 0x0000A50F;
 }

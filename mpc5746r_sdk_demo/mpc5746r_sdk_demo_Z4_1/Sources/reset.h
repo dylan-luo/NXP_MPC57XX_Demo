@@ -20,5 +20,6 @@ void DSPI0_Reset(void);
 void DSPI1_Reset(void);
 void Clock_Reset(void);
 void Prepare_Before_Jump(void);
+void Sys_SoftReset(void);
 
 #endif /* RESET_H_ */

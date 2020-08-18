@@ -7,5 +7,6 @@
 /Debug_RAM/
 /Release/
 
+/.settings/
 .mpc5746r_sdk_demo_Z4_1.g_c
 .mpc5746r_sdk_demo_Z4_1.g_x

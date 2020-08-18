@@ -1,0 +1,12 @@
+/.settings/
+/Debug/
+/Debug_RAM/
+/Release/
+/SourceInsight
+/doxygen
+
+.mpc5777c_dspi_dma_transfer.g_c
+.mpc5777c_dspi_dma_transfer.g_x
+description.txt
+/Generated_Code/*
+/SDK/*

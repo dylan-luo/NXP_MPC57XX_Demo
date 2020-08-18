@@ -241,6 +241,39 @@ Module "eee1"      (component eee)
    - eee1_EEE_DRV_RemoveEeprom -Remove the EEPROM emulation.
    - eee1_EEE_DRV_MainFunction -The main function to help completion in swap progress.
 
+Module "swt1"      (component swt)
+   - swt1_SWT_DRV_LockConfig -Lock SWT registers. This function locks the SWT register. When locked, the SWT_CR, SWT_TO, SWT_WN 
+                and SWT_SK registers are read-only.
+   - swt1_SWT_DRV_Init -Initializes the SWT instance. This function initializes the SWT instance by user configuration. Ensure 
+                that the SIRC clock gate is enabled.
+   - swt1_SWT_DRV_GetDefaultConfig -Gets the default configuration of the SWT. This function gets the default configuration of 
+                the SWT.
+   - swt1_SWT_DRV_Deinit -De-initializes the SWT instance. This function resets all configuration to default and disable the 
+                SWT instance.
+   - swt1_SWT_DRV_SetServiceConfig -Sets service mode. This function sets service mode and sets initial service key if in Keyed 
+                Service Mode. This function will unlock the SWT configuration.
+   - swt1_SWT_DRV_Service -Services the SWT. This function resets the SWT counter in fixed service sequence and keyed service 
+                sequence modes.    - Fixed Service Sequence Mode: write fixed keys.    - Keyed Service Sequence Mode: write 
+                pseudo random keys (17*SK+3) mod 2^16.
+   - swt1_SWT_DRV_SetIntConfig -Sets timeout interrupt. This function enables/disables the SWT timeout interrupt. This function 
+                will unlock the SWT configuration.
+   - swt1_SWT_DRV_ClearIntFlag -Clears the Timeout Interrupt Flag. This function clears the Timeout Interrupt Flag.
+   - swt1_SWT_DRV_GetIntStatus -Gets the Timeout Interrupt Status. This function gets the Timeout Interrupt Status.
+   - swt1_SWT_DRV_SetTimeoutValue -Sets timeout value. This function sets timeout value. This function will unlock the SWT 
+                configuration.
+   - swt1_SWT_DRV_SetWindowConfig -Sets window mode. This function enables/disables window mode and sets window value if 
+                enabled.
+   - swt1_SWT_DRV_GetCounterValue -Gets the value of the SWT counter. This function gets the value of the SWT counter. When the 
+                watchdog is disabled (SWT_CR[WEN] is 0), this field shows the value of the internal down counter. When the 
+                watchdog is enabled (SWT_CR[WEN] is 1), this field is cleared (the value is 0x0000_0000). Values in this field 
+                can lag behind the internal counter value for up to 6 system clock cycles plus 8 counter clock cycles. 
+                Therefore, the value read from this field immediately after disabling the watchdog may be higher than the 
+                actual value of the internal counter. The SWT timer should be stopped before calling this function.
+   - swt1_SWT_DRV_StartTimer -Enables the SWT timer. This function enables the SWT timer. This function will unlock the SWT 
+                configuration.
+   - swt1_SWT_DRV_StopTimer -Disables the SWT timer. This function disables the SWT timer. This function will unlock the SWT 
+                configuration.
+
 Module "Cpu"       (component MPC5746R_252)
    - Cpu_SystemInit -This method configures the oscillator (PLL) that is part of the microcontroller device. SystemInit is 
                 called from startup_device file.
