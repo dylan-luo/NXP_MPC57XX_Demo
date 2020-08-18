@@ -48,7 +48,7 @@ volatile int exit_code = 0;
 #include <stdint.h>
 #include <stdbool.h>
 
-/* Port PTI[0] on MPC57xx Motherboard */
+/* Port PTI[0] on MPC5775E-EVB */
 #define LED_PORT	PTF
 #define LED_PIN1    19  //LED1
 #define LED_PIN2	20  //LED2

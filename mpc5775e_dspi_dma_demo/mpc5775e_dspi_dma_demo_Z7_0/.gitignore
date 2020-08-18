@@ -1,0 +1,12 @@
+/.settings/
+/Debug/
+/Debug_RAM/
+/Release/
+/SourceInsight/
+/Documentation/
+
+.mpc5775e_dspi_dma_demo_Z7_0.g_c
+.mpc5775e_dspi_dma_demo_Z7_0.g_x
+/Generated_Code/*
+/SDK/*
+/Debug_FLASH/
